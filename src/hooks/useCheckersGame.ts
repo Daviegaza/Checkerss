@@ -22,7 +22,6 @@ import {
 // ─── Initial State ────────────────────────────────────────────────────────────
 
 function makeInitialState(): GameState {
-
   const board = createInitialBoard();
   const allLegalMoves = getLegalMoves(board, 'red');
   return {
