@@ -1,0 +1,133 @@
+/* ── App-level styles ────────────────────────────────────────────────────────
+   Global layout helpers, screen transitions, and shared component utilities.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* ── Screen transitions ──────────────────────────────────────────────────── */
+.screen-enter {
+  animation: screenFadeIn 0.3s ease forwards;
+}
+
+@keyframes screenFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Layout helpers ──────────────────────────────────────────────────────── */
+.game-layout { display: flex; gap: 20px; align-items: flex-start; width: 100%; }
+.game-layout--desktop { flex-direction: row; justify-content: center; }
+.game-layout--mobile  { flex-direction: column; align-items: center; }
+.board-area { display: flex; flex-direction: column; gap: 6px; }
+
+/* ── Panel base ──────────────────────────────────────────────────────────── */
+.panel {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+}
+
+.panel--ember {
+  background: linear-gradient(135deg, #180e06 0%, #0e0804 100%);
+  border-color: #3a1e08;
+}
+
+/* ── Section label ───────────────────────────────────────────────────────── */
+.section-label {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #6a4030;
+  padding: 6px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ── Turn dot indicator ──────────────────────────────────────────────────── */
+.turn-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.turn-dot--red    { background: #e05020; box-shadow: 0 0 8px #e05020; }
+.turn-dot--blue   { background: #7dd3fc; box-shadow: 0 0 8px #7dd3fc; }
+.turn-dot--off    { background: #3a3a4a; }
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.btn {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 8px;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: filter 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.btn--ember {
+  background: rgba(200, 80, 20, 0.12);
+  border-color: rgba(200, 80, 20, 0.35);
+  color: #e05020;
+}
+.btn--ember:hover { background: rgba(200, 80, 20, 0.22); filter: brightness(1.1); }
+
+.btn--ghost {
+  background: transparent;
+  border-color: #3a1e08;
+  color: #8a5030;
+}
+.btn--ghost:hover { border-color: #8a5030; color: #e05020; }
+
+.btn--danger {
+  background: transparent;
+  border-color: rgba(200, 50, 50, 0.4);
+  color: rgba(200, 80, 80, 0.8);
+}
+.btn--danger:hover { background: rgba(200, 50, 50, 0.15); color: #f87171; }
+
+.btn--full { width: 100%; }
+
+/* ── Gradient text ───────────────────────────────────────────────────────── */
+.text-ember-gradient {
+  background: linear-gradient(180deg, #ff7733 0%, #e04010 50%, #901808 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 639px) {
+  .hide-mobile { display: none !important; }
+  .btn { padding: 13px 16px; font-size: 11px; }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .hide-tablet { display: none !important; }
+}
+
+@media (min-width: 1024px) {
+  .hide-desktop { display: none !important; }
+}
+
+/* ── Balance pill ────────────────────────────────────────────────────────── */
+.balance-pill {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px; padding: 5px 12px;
+}
+.balance-pill__label { color: #6a3818; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; }
+.balance-pill__value { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: #e05020; }
+.balance-pill__value--low { color: #f87171; }
+
+/* ── Glow utilities ──────────────────────────────────────────────────────── */
+.glow-ember { filter: drop-shadow(0 0 16px rgba(224, 80, 32, 0.5)); }
+.glow-green { filter: drop-shadow(0 0 16px rgba(74, 222, 128, 0.5)); }
+.glow-red   { filter: drop-shadow(0 0 16px rgba(248, 113, 113, 0.5)); }

@@ -1,0 +1,55 @@
+/* ── Reset ────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  height: 100%;
+  width: 100%;
+  background: #050403;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  min-height: 100%;
+  width: 100%;
+  background: #050403;
+  color: #e05020;
+  font-family: 'Crimson Pro', Georgia, serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+}
+
+#root { min-height: 100vh; width: 100%; }
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #0a0604; }
+::-webkit-scrollbar-thumb { background: #3a1808; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #5a2810; }
+
+/* ── Selection ───────────────────────────────────────────────────────────── */
+::selection { background: rgba(224,80,32,0.25); color: #ff8844; }
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.02); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+button {
+  border: none; background: none; font-family: inherit;
+  min-height: 36px; touch-action: manipulation; cursor: pointer;
+}
+button:focus-visible { outline: 2px solid rgba(224,80,32,0.5); outline-offset: 2px; }
+
+/* ── Mobile text adjustment ──────────────────────────────────────────────── */
+@media (max-width: 639px) {
+  body { -webkit-text-size-adjust: 100%; }
+}
