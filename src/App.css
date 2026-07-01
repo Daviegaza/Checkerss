@@ -131,3 +131,145 @@
 .glow-ember { filter: drop-shadow(0 0 16px rgba(224, 80, 32, 0.5)); }
 .glow-green { filter: drop-shadow(0 0 16px rgba(74, 222, 128, 0.5)); }
 .glow-red   { filter: drop-shadow(0 0 16px rgba(248, 113, 113, 0.5)); }
+
+/* ── Kingfall casino polish ──────────────────────────────────────────────── */
+:root {
+  --kf-safe-top: env(safe-area-inset-top, 0px);
+  --kf-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --kf-safe-left: env(safe-area-inset-left, 0px);
+  --kf-safe-right: env(safe-area-inset-right, 0px);
+}
+
+html, body, #root { min-height: 100%; }
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-y: contain;
+}
+
+@keyframes kfPulseGreen {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.35), inset 0 1px 0 rgba(255,255,255,0.06); }
+  50%      { box-shadow: 0 0 0 8px rgba(74,222,128,0), inset 0 1px 0 rgba(255,255,255,0.06); }
+}
+@keyframes kfPulseRed {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(240,77,92,0.35), inset 0 1px 0 rgba(255,255,255,0.06); }
+  50%      { box-shadow: 0 0 0 8px rgba(240,77,92,0), inset 0 1px 0 rgba(255,255,255,0.06); }
+}
+@keyframes kfShimmer {
+  0% { background-position: -220px 0; }
+  100% { background-position: 220px 0; }
+}
+@keyframes kfSlideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes kfFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2px); }
+}
+@keyframes kfBoardHalo {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.9; }
+}
+@keyframes kfCoinSpin {
+  0%   { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+
+.kf-slide-up { animation: kfSlideUp 0.35s ease both; }
+.kf-pulse-green { animation: kfPulseGreen 2.2s ease-in-out infinite; }
+.kf-pulse-red   { animation: kfPulseRed   2.2s ease-in-out infinite; }
+.kf-float { animation: kfFloat 3.2s ease-in-out infinite; }
+.kf-coin  { animation: kfCoinSpin 6s linear infinite; }
+
+.kf-shimmer-gold {
+  background: linear-gradient(90deg, #fce49a 0%, #f0c040 40%, #fff5c0 50%, #f0c040 60%, #7a5a10 100%);
+  background-size: 220px 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: kfShimmer 3.5s linear infinite;
+}
+
+.kf-scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.kf-scroll-x::-webkit-scrollbar { display: none; }
+.kf-snap { scroll-snap-align: start; }
+
+.kf-glass {
+  background: linear-gradient(180deg, rgba(12,10,8,0.85) 0%, rgba(6,5,4,0.78) 100%);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border-bottom: 1px solid rgba(240,192,64,0.15);
+}
+
+.kf-safe-top    { padding-top: calc(10px + var(--kf-safe-top)); }
+.kf-safe-bottom { padding-bottom: calc(12px + var(--kf-safe-bottom)); }
+
+.kf-tap { transition: transform 0.12s ease, filter 0.12s ease, background 0.15s ease; }
+.kf-tap:active { transform: scale(0.96); filter: brightness(1.12); }
+
+.kf-hairline {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(240,192,64,0.35), transparent);
+}
+
+/* Board halo — subtle animated glow behind the felt */
+.kf-board-halo {
+  position: relative;
+  isolation: isolate;
+}
+.kf-board-halo::before {
+  content: '';
+  position: absolute; inset: -18px;
+  border-radius: 22px;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(240,192,64,0.28) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 100%, rgba(74,222,128,0.18) 0%, transparent 55%);
+  filter: blur(20px);
+  z-index: -1;
+  animation: kfBoardHalo 4.5s ease-in-out infinite;
+}
+
+.kf-h1 { font-family: 'Playfair Display', serif; font-weight: 900; letter-spacing: 0.06em; }
+.kf-cap { font-family: 'Cinzel', serif; text-transform: uppercase; letter-spacing: 0.22em; }
+
+@media (prefers-reduced-motion: reduce) {
+  .kf-pulse-green, .kf-pulse-red, .kf-shimmer-gold, .kf-float, .kf-coin, .kf-board-halo::before {
+    animation: none !important;
+  }
+}
+
+/* Toast slide */
+@keyframes kfToastIn {
+  0%   { opacity: 0; transform: translate(-50%, -18px) scale(0.94); }
+  100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+.kf-toast {
+  position: fixed; top: calc(70px + var(--kf-safe-top));
+  left: 50%; transform: translateX(-50%);
+  z-index: 500;
+  padding: 12px 18px; border-radius: 12px;
+  background: linear-gradient(180deg, rgba(60,40,10,0.96), rgba(30,20,5,0.98));
+  border: 1px solid rgba(240,192,64,0.55);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.7), 0 0 24px rgba(240,192,64,0.28);
+  color: #f0e6cf;
+  font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 0.2em; font-weight: 700;
+  display: flex; gap: 10px; align-items: center; min-width: 200px;
+  animation: kfToastIn 0.35s cubic-bezier(0.2, 1.1, 0.4, 1) both;
+}
+
+/* Piece legal-move dot pulse — subtle attention */
+@keyframes kfDotPulse {
+  0%, 100% { transform: scale(1); opacity: 0.75; }
+  50%      { transform: scale(1.18); opacity: 1; }
+}
+.kf-dot-pulse { animation: kfDotPulse 1.4s ease-in-out infinite; }
+
+/* Board piece press feedback */
+.kf-piece { transition: transform 0.2s cubic-bezier(0.2, 1.1, 0.4, 1); }
+.kf-piece:active { transform: scale(0.94); }
