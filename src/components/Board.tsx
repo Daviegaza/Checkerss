@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { GameState, Move, Position } from '../types/checkers.types';
+import { ChipSkinId } from '../types/game.types';
 import Square from './Square';
 
 interface BoardProps {
@@ -7,6 +8,7 @@ interface BoardProps {
   onSquareClick: (pos: Position) => void;
   isAITurn: boolean;
   squareSize?: number;
+  skinId?: ChipSkinId;
 }
 
 const Board: React.FC<BoardProps> = ({
@@ -14,6 +16,7 @@ const Board: React.FC<BoardProps> = ({
   onSquareClick,
   isAITurn,
   squareSize = 72,
+  skinId = 'classic',
 }) => {
   const { board, selectedSquare, legalMovesForSelected, moveHistory } = gameState;
 
@@ -44,10 +47,10 @@ const Board: React.FC<BoardProps> = ({
         display: 'grid',
         gridTemplateColumns: `repeat(8, ${squareSize}px)`,
         gridTemplateRows: `repeat(8, ${squareSize}px)`,
-        border: '3px solid #8a5020',
-        borderRadius: 4,
+        border: '4px solid #7a5a10',
+        borderRadius: 6,
         boxShadow:
-          '0 0 0 1px #4a2808, 0 24px 64px rgba(0,0,0,0.85), 0 4px 16px rgba(180,120,0,0.12)',
+          '0 0 0 2px #3a2a08, 0 0 0 4px rgba(240,192,64,0.2), 0 24px 64px rgba(0,0,0,0.85), 0 4px 22px rgba(240,192,64,0.18)',
         overflow: 'hidden',
         cursor: isAITurn ? 'not-allowed' : 'default',
         opacity: isAITurn ? 0.93 : 1,
@@ -78,6 +81,7 @@ const Board: React.FC<BoardProps> = ({
               isCapture={isCapture}
               onClick={isAITurn ? () => {} : onSquareClick}
               size={squareSize}
+              skinId={skinId}
             />
           );
         })

@@ -1,9 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { CheckerPiece } from '../types/checkers.types';
+import { ChipSkinId, CHIP_SKINS } from '../types/game.types';
 
 interface CheckerPieceProps {
   piece: CheckerPiece;
   size?: number;
+  skinId?: ChipSkinId;
 }
 
 // ─── Color Palettes ───────────────────────────────────────────────────────────
@@ -16,22 +18,24 @@ interface Pal {
   crownBase: string; crownHi: string; crownDrk: string;
 }
 
+// Player (red engine color) — burgundy chip with gold inlay
 const RED: Pal = {
-  sideL:   '#3b0000', sideM:   '#8b1a1a', sideH:   '#d94040', sideD:   '#1a0000',
-  faceH:   '#ff8888', faceM:   '#dd2222', faceD:   '#991111', faceDrk: '#550000',
-  ring:    'rgba(80,0,0,0.55)',
-  spec:    'rgba(255,200,200,0.72)', specDim: 'rgba(255,160,160,0.28)',
-  rimTop:  'rgba(255,120,120,0.35)',
-  crownBase:'#c8940a', crownHi: '#ffe066', crownDrk: '#7a5500',
+  sideL:   '#2a0510', sideM:   '#5c0e20', sideH:   '#8a1a2e', sideD:   '#12030a',
+  faceH:   '#d84a5c', faceM:   '#8a1a2e', faceD:   '#4a0812', faceDrk: '#20040a',
+  ring:    'rgba(240,192,64,0.55)',
+  spec:    'rgba(255,220,150,0.65)', specDim: 'rgba(255,180,120,0.22)',
+  rimTop:  'rgba(240,192,64,0.55)',
+  crownBase:'#c8940a', crownHi: '#ffe066', crownDrk: '#5a3f00',
 };
 
+// House (black engine color) — onyx chip with platinum rim
 const BLK: Pal = {
-  sideL:   '#0d0d0d', sideM:   '#282828', sideH:   '#505050', sideD:   '#060606',
-  faceH:   '#909090', faceM:   '#3c3c3c', faceD:   '#1c1c1c', faceDrk: '#0a0a0a',
-  ring:    'rgba(255,255,255,0.10)',
-  spec:    'rgba(255,255,255,0.48)', specDim: 'rgba(255,255,255,0.15)',
-  rimTop:  'rgba(200,200,200,0.22)',
-  crownBase:'#bfa040', crownHi: '#ffe080', crownDrk: '#6a4800',
+  sideL:   '#050508', sideM:   '#1a1a22', sideH:   '#3a3a48', sideD:   '#020204',
+  faceH:   '#5a6070', faceM:   '#242630', faceD:   '#0e1018', faceDrk: '#050508',
+  ring:    'rgba(200,208,224,0.28)',
+  spec:    'rgba(220,225,235,0.55)', specDim: 'rgba(180,190,210,0.18)',
+  rimTop:  'rgba(200,208,224,0.35)',
+  crownBase:'#c8d0e0', crownHi: '#ffffff', crownDrk: '#4a5060',
 };
 
 // ─── Draw Helpers ─────────────────────────────────────────────────────────────
@@ -196,7 +200,37 @@ function drawCrown(
 
 // ─── React Component ─────────────────────────────────────────────────────────
 
-const CheckerPieceCanvas: React.FC<CheckerPieceProps> = ({ piece, size = 72 }) => {
+// Convert a hex accent into a Pal by darkening/lightening
+function hexToRgb(h: string): [number, number, number] {
+  const s = h.replace('#', '');
+  const n = parseInt(s.length === 3 ? s.split('').map(c => c + c).join('') : s, 16);
+  return [(n >> 16) & 0xff, (n >> 8) & 0xff, n & 0xff];
+}
+function shade(h: string, amt: number): string {
+  const [r, g, b] = hexToRgb(h);
+  const clamp = (v: number) => Math.max(0, Math.min(255, Math.round(v)));
+  const nr = clamp(r + amt), ng = clamp(g + amt), nb = clamp(b + amt);
+  return `#${nr.toString(16).padStart(2, '0')}${ng.toString(16).padStart(2, '0')}${nb.toString(16).padStart(2, '0')}`;
+}
+function palFromAccent(accent: string, isHouse: boolean): Pal {
+  return {
+    sideL:   shade(accent, -100),
+    sideM:   shade(accent, -55),
+    sideH:   shade(accent, -15),
+    sideD:   shade(accent, -130),
+    faceH:   shade(accent, +40),
+    faceM:   shade(accent, -30),
+    faceD:   shade(accent, -70),
+    faceDrk: shade(accent, -110),
+    ring:    isHouse ? 'rgba(200,208,224,0.28)' : 'rgba(240,192,64,0.55)',
+    spec:    isHouse ? 'rgba(220,225,235,0.55)' : 'rgba(255,220,150,0.65)',
+    specDim: isHouse ? 'rgba(180,190,210,0.18)' : 'rgba(255,180,120,0.22)',
+    rimTop:  isHouse ? 'rgba(200,208,224,0.35)' : 'rgba(240,192,64,0.55)',
+    crownBase: '#c8940a', crownHi: '#ffe066', crownDrk: '#5a3f00',
+  };
+}
+
+const CheckerPieceCanvas: React.FC<CheckerPieceProps> = ({ piece, size = 72, skinId = 'classic' }) => {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -215,9 +249,17 @@ const CheckerPieceCanvas: React.FC<CheckerPieceProps> = ({ piece, size = 72 }) =
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, size, size);
 
-    const pal = piece.color === 'red' ? RED : BLK;
+    let pal: Pal;
+    if (skinId === 'classic') {
+      pal = piece.color === 'red' ? RED : BLK;
+    } else {
+      const skin = CHIP_SKINS[skinId] || CHIP_SKINS.classic;
+      pal = piece.color === 'red'
+        ? palFromAccent(skin.playerColor, false)
+        : palFromAccent(skin.houseColor, true);
+    }
     drawDisc(ctx, size, pal, piece.isKing);
-  }, [piece.color, piece.isKing, size]);
+  }, [piece.color, piece.isKing, size, skinId]);
 
   return (
     <canvas

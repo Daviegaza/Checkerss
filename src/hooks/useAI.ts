@@ -14,10 +14,11 @@ interface UseAIOptions {
 }
 
 const AI_DELAY: Record<DifficultyLevel, [number, number]> = {
-  easy:   [300,  700],
-  medium: [500, 1000],
-  hard:   [700, 1500],
-  expert: [900, 2000],
+  easy:       [300,  700],
+  medium:     [500, 1000],
+  hard:       [700, 1500],
+  expert:     [900, 2000],
+  highroller: [1100, 2400],
 };
 
 export function useAI({

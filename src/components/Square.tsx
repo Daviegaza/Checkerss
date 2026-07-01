@@ -1,5 +1,6 @@
 import React from 'react';
-import { CheckerPiece, Move, Position } from '../types/checkers.types';
+import { CheckerPiece, Position } from '../types/checkers.types';
+import { ChipSkinId, CHIP_SKINS } from '../types/game.types';
 import CheckerPieceCanvas from './CheckerPiece';
 
 interface SquareProps {
@@ -14,25 +15,28 @@ interface SquareProps {
   isCapture: boolean;
   onClick: (pos: Position) => void;
   size: number;
+  skinId?: ChipSkinId;
 }
 
 const Square: React.FC<SquareProps> = ({
   row, col, piece, isDark, isSelected, isLegalDest,
   isLastMoveFrom, isLastMoveTo, isCapture,
-  onClick, size,
+  onClick, size, skinId = 'classic',
 }) => {
   const handleClick = () => {
     if (isDark) onClick({ row, col });
   };
 
-  // Board colors – rich dark walnut & cream
-  let bg = isDark ? '#4a2c0a' : '#e8d5a3';
+  const skin = CHIP_SKINS[skinId] || CHIP_SKINS.classic;
+
+  // Board colors from active skin
+  let bg = isDark ? skin.boardDark : skin.boardLight;
 
   if (isDark) {
-    if (isSelected)      bg = '#b8860b';
-    else if (isLastMoveTo)   bg = '#6b5a10';
-    else if (isLastMoveFrom) bg = '#5a4a0a';
-    else if (isCapture)      bg = '#6b1a1a';
+    if (isSelected)      bg = '#d4a017';
+    else if (isLastMoveTo)   bg = '#4a7a28';
+    else if (isLastMoveFrom) bg = '#356a34';
+    else if (isCapture)      bg = '#a02040';
   }
 
   return (
@@ -88,7 +92,7 @@ const Square: React.FC<SquareProps> = ({
           transition: 'transform 0.12s ease',
           filter: isSelected ? 'drop-shadow(0 6px 10px rgba(0,0,0,0.7))' : 'none',
         }}>
-          <CheckerPieceCanvas piece={piece} size={size * 0.88} />
+          <CheckerPieceCanvas piece={piece} size={size * 0.88} skinId={skinId} />
         </div>
       )}
 
@@ -98,7 +102,7 @@ const Square: React.FC<SquareProps> = ({
           position: 'absolute', top: 2, left: 3,
           fontSize: Math.max(9, size * 0.14),
           fontWeight: 700,
-          color: 'rgba(255,200,100,0.5)',
+          color: 'rgba(240,192,64,0.55)',
           lineHeight: 1,
           
           pointerEvents: 'none',
@@ -112,7 +116,7 @@ const Square: React.FC<SquareProps> = ({
           position: 'absolute', bottom: 2, right: 3,
           fontSize: Math.max(9, size * 0.14),
           fontWeight: 700,
-          color: 'rgba(255,200,100,0.5)',
+          color: 'rgba(240,192,64,0.55)',
           lineHeight: 1,
           
           pointerEvents: 'none',
