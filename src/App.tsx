@@ -130,9 +130,9 @@ const App: React.FC = () => {
   }, [gameState.moveHistory.length, screen]);
 
   // ── Responsive square size ─────────────────────────────────────────────────
-  // Mobile overhead (side 8 + panel 8 + rail 12 + gap 4) ≈ 32px.
+  // Mobile overhead: outer padding 8 + panel padding 8 + rail 12 + rail-gap 6 + safety 10 ≈ 44px.
   const squareSize = (() => {
-    if (isMobile) return Math.min(58, Math.floor((width - 32) / 8));
+    if (isMobile) return Math.max(32, Math.min(56, Math.floor((width - 44) / 8)));
     if (isTablet) return Math.floor((Math.min(width * 0.9, 620) - 80) / 8);
     return Math.min(68, Math.floor((width - 640) / 8));
   })();

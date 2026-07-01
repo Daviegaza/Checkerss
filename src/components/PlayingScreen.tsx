@@ -89,8 +89,8 @@ const BoardShell: React.FC<{
   const cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
   const rows = [8, 7, 6, 5, 4, 3, 2, 1];
   const isSmall = squareSize < 55;
-  const railSize = isSmall ? 12 : 22;
-  const padSize = isSmall ? 4 : 20;
+  const railSize = isSmall ? 14 : 22;
+  const padSize = isSmall ? 6 : 20;
   return (
     <div className="kf-board-halo kf-slide-up" style={{ maxWidth: '100%' }}><Panel style={{
       padding: padSize,
