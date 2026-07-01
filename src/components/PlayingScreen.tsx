@@ -149,10 +149,10 @@ const BoardShell: React.FC<{
 };
 
 const betStep = (): React.CSSProperties => ({
-  width: 48, height: 48, borderRadius: 10,
+  width: 40, height: 40, borderRadius: 10,
   background: 'rgba(240,192,64,0.12)', border: '1px solid rgba(240,192,64,0.35)',
-  color: GOLD, fontSize: 22, fontWeight: 700,
-  cursor: 'pointer', fontFamily: DISPLAY, minWidth: 48,
+  color: GOLD, fontSize: 20, fontWeight: 700,
+  cursor: 'pointer', fontFamily: DISPLAY, minWidth: 40, flexShrink: 0,
 });
 
 const BetAmountCard: React.FC<{ bet: number; onSfx: (n: 'chipClick' | 'hover') => void }> = ({ bet, onSfx }) => {
@@ -163,14 +163,14 @@ const BetAmountCard: React.FC<{ bet: number; onSfx: (n: 'chipClick' | 'hover') =
     setAmt(a => Math.max(1, a + d));
   };
   return (
-    <Panel style={{ padding: 14 }}>
+    <Panel style={{ padding: 12, minWidth: 0 }}>
       <div style={cinzel(9, '0.28em', GOLD_INK)}>BET AMOUNT</div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
         <button className="kf-tap" style={betStep()} onClick={() => step(-1)}>−</button>
-        <div style={{ flex: 1, textAlign: 'center', display: 'flex', gap: 10, alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontFamily: DISPLAY, fontSize: 24, fontWeight: 900, color: CREAM }}>{amt}</span>
+        <div style={{ flex: 1, minWidth: 0, textAlign: 'center', display: 'flex', gap: 6, alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontFamily: DISPLAY, fontSize: 20, fontWeight: 900, color: CREAM, overflow: 'hidden', textOverflow: 'ellipsis' }}>{amt}</span>
           <span style={{
-            width: 22, height: 22, borderRadius: '50%',
+            width: 18, height: 18, borderRadius: '50%', flexShrink: 0,
             background: 'radial-gradient(circle at 30% 30%, #f8d070, #7a5a10)',
             border: '1px solid rgba(255,220,120,0.6)',
           }} />
@@ -221,22 +221,27 @@ const QuickBetCard: React.FC<{ current: number; onSfx: (n: 'chipClick' | 'hover'
   const [pick, setPick] = React.useState(current);
   React.useEffect(() => setPick(current), [current]);
   return (
-    <Panel style={{ padding: 14 }}>
+    <Panel style={{ padding: 12, minWidth: 0 }}>
       <div style={cinzel(9, '0.28em', GOLD_INK)}>QUICK BET</div>
-      <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+        gap: 4, marginTop: 10,
+      }}>
         {opts.map(v => {
           const active = v === pick;
           return (
             <button key={v} onClick={() => { onSfx('chipClick'); setPick(v); }} className="kf-tap" style={{
-              flex: '1 1 0', minWidth: 0, textAlign: 'center',
-              padding: '10px 4px', borderRadius: 8,
+              minWidth: 0, width: '100%', textAlign: 'center',
+              padding: '10px 2px', borderRadius: 8,
               background: active
                 ? 'linear-gradient(180deg, rgba(240,192,64,0.28), rgba(240,192,64,0.08))'
                 : 'rgba(255,255,255,0.03)',
               border: `1px solid ${active ? GOLD : 'rgba(255,255,255,0.06)'}`,
               color: active ? GOLD : CREAM,
-              fontFamily: DISPLAY, fontWeight: 800, fontSize: 15,
-              cursor: 'pointer', minHeight: 52,
+              fontFamily: DISPLAY, fontWeight: 800, fontSize: 13,
+              cursor: 'pointer', minHeight: 48,
+              overflow: 'hidden', textOverflow: 'ellipsis',
             }}>{v}</button>
           );
         })}
@@ -327,13 +332,13 @@ const TurnBanner: React.FC<{ isYou: boolean; isAIThinking: boolean; isGameOver: 
   };
 
 const GameHistoryCard: React.FC<{ moves: { num: number; red?: string; black?: string }[] }> = ({ moves }) => (
-  <Panel style={{ padding: 16, minHeight: 220 }}>
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+  <Panel style={{ padding: 14 }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
       <div style={cinzel(9, '0.28em', GREEN)}>GAME HISTORY</div>
       <div style={{ ...cinzel(9, '0.14em', GOLD_INK), whiteSpace: 'nowrap' }}>Last 10</div>
     </div>
     <HairlineDivider />
-    <div style={{ maxHeight: 200, overflowY: 'auto', paddingRight: 4 }}>
+    <div style={{ maxHeight: 160, overflowY: 'auto', paddingRight: 4 }}>
       {moves.length === 0 ? (
         <div style={{ padding: '8px 0', color: GOLD_INK, fontFamily: BODY, fontSize: 12, fontStyle: 'italic' }}>
           <span style={{ color: GOLD, marginRight: 6 }}>◆</span>Awaiting first move…
@@ -425,9 +430,9 @@ const PlayingScreen: React.FC<PlayingScreenProps> = (p) => {
   if (isMobile || isTablet) {
     return (
       <div style={{
-        padding: '6px 4px 20px', display: 'flex', flexDirection: 'column', gap: 10,
-        color: CREAM, maxWidth: '100%', overflowX: 'hidden',
-        alignItems: 'stretch', justifyContent: 'flex-start',
+        padding: '6px 6px 20px', display: 'flex', flexDirection: 'column', gap: 10,
+        color: CREAM, width: '100%', maxWidth: '100%', overflowX: 'hidden', minWidth: 0,
+        alignItems: 'stretch', justifyContent: 'flex-start', boxSizing: 'border-box',
       }}>
         <BoardShell
           gameState={gameState} config={config}
@@ -437,7 +442,7 @@ const PlayingScreen: React.FC<PlayingScreenProps> = (p) => {
         />
         <SideBetStrip sideBetState={sideBetState} />
         <div className="kf-slide-up" style={{
-          display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 8,
+          display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.35fr)', gap: 8,
         }}>
           <div style={{
             display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center',
@@ -467,7 +472,7 @@ const PlayingScreen: React.FC<PlayingScreenProps> = (p) => {
           />
         </div>
         <ChipThemesCard activeId={activeSkinId} unlocked={unlockedSkins} onEquip={onEquipSkin} onSfx={onSfx} />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8 }}>
           <BetAmountCard bet={config.cost} onSfx={onSfx} />
           <QuickBetCard current={config.cost} onSfx={onSfx} />
         </div>
