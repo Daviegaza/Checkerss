@@ -181,11 +181,12 @@ const GameActionsCard: React.FC<{
   muted: boolean; ambientOn: boolean;
   onMute: () => void; onAmbient: () => void;
   onHint: () => void; onLobby: () => void;
-  hintDisabled: boolean;
-}> = ({ muted, ambientOn, onMute, onAmbient, onHint, onLobby, hintDisabled }) => (
+  onFold: () => void;
+  hintDisabled: boolean; foldDisabled: boolean;
+}> = ({ muted, ambientOn, onMute, onAmbient, onHint, onLobby, onFold, hintDisabled, foldDisabled }) => (
   <Panel style={{ padding: 12, minWidth: 0 }}>
     <div style={cinzel(9, '0.28em', GOLD_INK)}>QUICK ACTIONS</div>
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 6, marginTop: 10 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 6, marginTop: 10 }}>
       <button className="kf-tap" style={actionBtn(GOLD, !muted)} onClick={onMute}>
         <span style={{ fontSize: 16 }}>{muted ? '♪̸' : '♪'}</span>
         <span>{muted ? 'MUTED' : 'SOUND'}</span>
@@ -203,9 +204,28 @@ const GameActionsCard: React.FC<{
         <span style={{ fontSize: 16 }}>✦</span>
         <span>HINT</span>
       </button>
-      <button className="kf-tap" style={actionBtn(RED)} onClick={onLobby}>
+      <button className="kf-tap" style={actionBtn('#c0a870')} onClick={onLobby}>
         <span style={{ fontSize: 16 }}>⌂</span>
         <span>LOBBY</span>
+      </button>
+      <button
+        className="kf-tap"
+        style={{
+          ...actionBtn(RED, true),
+          background: foldDisabled
+            ? 'rgba(80,20,25,0.35)'
+            : 'linear-gradient(180deg, rgba(255,90,108,0.38), rgba(120,20,32,0.6))',
+          borderColor: foldDisabled ? 'rgba(255,90,108,0.2)' : RED,
+          color: foldDisabled ? 'rgba(255,90,108,0.45)' : '#fff',
+          opacity: foldDisabled ? 0.55 : 1,
+          cursor: foldDisabled ? 'not-allowed' : 'pointer',
+          boxShadow: foldDisabled ? 'none' : '0 6px 18px rgba(255,90,108,0.32)',
+        }}
+        onClick={() => { if (!foldDisabled) onFold(); }}
+        disabled={foldDisabled}
+      >
+        <span style={{ fontSize: 16 }}>⚑</span>
+        <span>FOLD</span>
       </button>
     </div>
   </Panel>
@@ -358,25 +378,6 @@ const GameHistoryCard: React.FC<{ moves: { num: number; red?: string; black?: st
   </Panel>
 );
 
-const FoldButton: React.FC<{ onClick: () => void; disabled: boolean }> = ({ onClick, disabled }) => (
-  <button onClick={onClick} disabled={disabled} className="kf-tap" style={{
-    width: '100%', padding: '14px',
-    background: disabled
-      ? 'rgba(60,20,25,0.4)'
-      : 'linear-gradient(180deg, rgba(140,30,45,0.45) 0%, rgba(80,15,25,0.7) 100%)',
-    border: `1px solid ${disabled ? 'rgba(240,77,92,0.15)' : 'rgba(240,77,92,0.55)'}`,
-    borderRadius: 12,
-    color: disabled ? 'rgba(240,77,92,0.35)' : RED,
-    fontFamily: HEADING, fontSize: 14, letterSpacing: '0.28em', fontWeight: 800,
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    display: 'flex', gap: 10, alignItems: 'center', justifyContent: 'center',
-    boxShadow: disabled ? 'none' : '0 6px 18px rgba(240,77,92,0.25)',
-    minHeight: 56,
-  }}>
-    <span>⚑</span> FOLD HAND
-  </button>
-);
-
 const SideBetStrip: React.FC<{ sideBetState: SideBetState }> = ({ sideBetState }) => {
   const activeIds = (Object.keys(sideBetState.active) as SideBetId[]).filter(k => sideBetState.active[k]);
   if (activeIds.length === 0) return null;
@@ -488,11 +489,12 @@ const PlayingScreen: React.FC<PlayingScreenProps> = (p) => {
           muted={muted} ambientOn={ambientOn}
           onMute={onToggleMute} onAmbient={onToggleAmbient}
           onHint={handleHint} onLobby={onGoToLobby}
+          onFold={onResign}
           hintDisabled={hintDisabled}
+          foldDisabled={gameState.isGameOver}
         />
         <StakeInfoCard cost={config.cost} reward={config.reward} />
         <GameHistoryCard moves={movePairs} />
-        <FoldButton onClick={onResign} disabled={gameState.isGameOver} />
       </div>
     );
   }
@@ -518,7 +520,9 @@ const PlayingScreen: React.FC<PlayingScreenProps> = (p) => {
             muted={muted} ambientOn={ambientOn}
             onMute={onToggleMute} onAmbient={onToggleAmbient}
             onHint={handleHint} onLobby={onGoToLobby}
+            onFold={onResign}
             hintDisabled={hintDisabled}
+            foldDisabled={gameState.isGameOver}
           />
         </div>
       </div>
@@ -532,7 +536,6 @@ const PlayingScreen: React.FC<PlayingScreenProps> = (p) => {
           winner={gameState.winner}
         />
         <GameHistoryCard moves={movePairs} />
-        <FoldButton onClick={onResign} disabled={gameState.isGameOver} />
       </div>
     </div>
   );
