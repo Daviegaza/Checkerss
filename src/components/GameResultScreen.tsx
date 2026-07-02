@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { GameResult, JACKPOT_TIERS, LevelConfig, PointsState, SIDE_BETS } from '../types/game.types';
 import { useWindowSize } from '../hooks/useWindowSize';
 import ChipCounter from './ChipCounter';
@@ -20,6 +20,7 @@ const GameResultScreen: React.FC<GameResultScreenProps> = ({
   const isWin = result.type === 'player_win';
   const isDraw = result.type === 'draw';
   const [displayedGain, setDisplayedGain] = useState(0);
+  const playAgainRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (result.jackpotHit) onSfx('jackpot');
@@ -27,7 +28,8 @@ const GameResultScreen: React.FC<GameResultScreenProps> = ({
     else if (isDraw) onSfx('draw');
     else onSfx('lose');
     const t = setTimeout(() => setDisplayedGain(result.pointsChange), 240);
-    return () => clearTimeout(t);
+    const f = setTimeout(() => { playAgainRef.current?.focus(); }, 400);
+    return () => { clearTimeout(t); clearTimeout(f); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -48,11 +50,11 @@ const GameResultScreen: React.FC<GameResultScreenProps> = ({
 
   return (
     <div style={{
-      minHeight: '100vh',
+      minHeight: isMobile ? 'auto' : '100vh',
       background: bgTint,
       display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center',
-      padding: isMobile ? '32px 18px' : '48px 32px',
+      alignItems: 'center', justifyContent: isMobile ? 'flex-start' : 'center',
+      padding: isMobile ? '20px 16px calc(130px + var(--kf-safe-bottom))' : '48px 32px',
       boxSizing: 'border-box', color: '#f0e6cf', position: 'relative',
     }}>
       <Confetti active={isWin || result.jackpotHit} intense={result.jackpotHit} />
@@ -183,6 +185,8 @@ const GameResultScreen: React.FC<GameResultScreenProps> = ({
           gap: 12, justifyContent: 'center',
         }}>
           <button
+            ref={playAgainRef}
+            className="kf-tap"
             onClick={() => { onSfx('chipClick'); onPlayAgain(); }}
             style={{
               background: config.gradient,
@@ -197,6 +201,7 @@ const GameResultScreen: React.FC<GameResultScreenProps> = ({
             }}
           >Rematch · {config.cost} chips</button>
           <button
+            className="kf-tap"
             onClick={() => { onSfx('chipClick'); onBackToLobby(); }}
             style={{
               background: 'transparent',
