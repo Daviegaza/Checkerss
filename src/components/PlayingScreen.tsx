@@ -8,14 +8,14 @@ import {
 import { getPieceCounts } from '../utils/checkersEngine';
 import { DailyBonusStatus } from '../hooks/usePoints';
 
-const GOLD = '#f0c040';
-const GOLD_INK = '#8a7a4a';
-const GREEN = '#4ade80';
-const RED = '#f04d5c';
-const CREAM = '#f0e6cf';
-const PANEL_BG = 'linear-gradient(180deg, rgba(20,26,22,0.92) 0%, rgba(10,14,12,0.94) 100%)';
-const PANEL_BORDER = '1px solid rgba(240,192,64,0.18)';
-const PANEL_BORDER_STRONG = '1px solid rgba(240,192,64,0.32)';
+const GOLD = '#f8ce55';
+const GOLD_INK = '#c0a870';
+const GREEN = '#5ee88f';
+const RED = '#ff5a6c';
+const CREAM = '#f5ecd6';
+const PANEL_BG = 'linear-gradient(180deg, rgba(34,42,36,0.94) 0%, rgba(20,26,22,0.96) 100%)';
+const PANEL_BORDER = '1px solid rgba(248,206,85,0.28)';
+const PANEL_BORDER_STRONG = '1px solid rgba(248,206,85,0.5)';
 const HEADING = "'Cinzel', serif";
 const DISPLAY = "'Playfair Display', serif";
 const BODY = "'Crimson Pro', serif";
@@ -148,38 +148,68 @@ const BoardShell: React.FC<{
   );
 };
 
-const betStep = (): React.CSSProperties => ({
-  width: 40, height: 40, borderRadius: 10,
-  background: 'rgba(240,192,64,0.12)', border: '1px solid rgba(240,192,64,0.35)',
-  color: GOLD, fontSize: 20, fontWeight: 700,
-  cursor: 'pointer', fontFamily: DISPLAY, minWidth: 40, flexShrink: 0,
+const StakeInfoCard: React.FC<{ cost: number; reward: number }> = ({ cost, reward }) => (
+  <Panel style={{ padding: 12, minWidth: 0 }}>
+    <div style={cinzel(9, '0.28em', GOLD_INK)}>STAKE · REWARD</div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
+      <div style={{ flex: 1, textAlign: 'center' }}>
+        <div style={cinzel(8, '0.18em', GOLD_INK)}>BUY-IN</div>
+        <div style={{ fontFamily: DISPLAY, fontSize: 20, fontWeight: 900, color: GOLD, marginTop: 2 }}>{cost}</div>
+      </div>
+      <div style={{ width: 1, height: 26, background: 'rgba(240,192,64,0.25)' }} />
+      <div style={{ flex: 1, textAlign: 'center' }}>
+        <div style={cinzel(8, '0.18em', GOLD_INK)}>PAYS</div>
+        <div style={{ fontFamily: DISPLAY, fontSize: 20, fontWeight: 900, color: GREEN, marginTop: 2 }}>+{reward}</div>
+      </div>
+    </div>
+  </Panel>
+);
+
+const actionBtn = (accent: string, active = false): React.CSSProperties => ({
+  padding: '10px 4px', borderRadius: 8, cursor: 'pointer',
+  background: active
+    ? `linear-gradient(180deg, ${accent}44, ${accent}18)`
+    : 'rgba(255,255,255,0.03)',
+  border: `1px solid ${active ? accent : 'rgba(255,255,255,0.06)'}`,
+  color: active ? accent : CREAM,
+  fontFamily: HEADING, fontSize: 9, letterSpacing: '0.18em', fontWeight: 700,
+  minHeight: 52,
+  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
 });
 
-const BetAmountCard: React.FC<{ bet: number; onSfx: (n: 'chipClick' | 'hover') => void }> = ({ bet, onSfx }) => {
-  const [amt, setAmt] = React.useState(bet);
-  React.useEffect(() => setAmt(bet), [bet]);
-  const step = (d: number) => {
-    onSfx('chipClick');
-    setAmt(a => Math.max(1, a + d));
-  };
-  return (
-    <Panel style={{ padding: 12, minWidth: 0 }}>
-      <div style={cinzel(9, '0.28em', GOLD_INK)}>BET AMOUNT</div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
-        <button className="kf-tap" style={betStep()} onClick={() => step(-1)}>−</button>
-        <div style={{ flex: 1, minWidth: 0, textAlign: 'center', display: 'flex', gap: 6, alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontFamily: DISPLAY, fontSize: 20, fontWeight: 900, color: CREAM, overflow: 'hidden', textOverflow: 'ellipsis' }}>{amt}</span>
-          <span style={{
-            width: 18, height: 18, borderRadius: '50%', flexShrink: 0,
-            background: 'radial-gradient(circle at 30% 30%, #f8d070, #7a5a10)',
-            border: '1px solid rgba(255,220,120,0.6)',
-          }} />
-        </div>
-        <button className="kf-tap" style={betStep()} onClick={() => step(1)}>+</button>
-      </div>
-    </Panel>
-  );
-};
+const GameActionsCard: React.FC<{
+  muted: boolean; ambientOn: boolean;
+  onMute: () => void; onAmbient: () => void;
+  onHint: () => void; onLobby: () => void;
+  hintDisabled: boolean;
+}> = ({ muted, ambientOn, onMute, onAmbient, onHint, onLobby, hintDisabled }) => (
+  <Panel style={{ padding: 12, minWidth: 0 }}>
+    <div style={cinzel(9, '0.28em', GOLD_INK)}>QUICK ACTIONS</div>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 6, marginTop: 10 }}>
+      <button className="kf-tap" style={actionBtn(GOLD, !muted)} onClick={onMute}>
+        <span style={{ fontSize: 16 }}>{muted ? '♪̸' : '♪'}</span>
+        <span>{muted ? 'MUTED' : 'SOUND'}</span>
+      </button>
+      <button className="kf-tap" style={actionBtn('#7ce6ff', ambientOn)} onClick={onAmbient}>
+        <span style={{ fontSize: 16 }}>{ambientOn ? '◉' : '○'}</span>
+        <span>AMBIENT</span>
+      </button>
+      <button
+        className="kf-tap"
+        style={{ ...actionBtn(GREEN), opacity: hintDisabled ? 0.4 : 1, cursor: hintDisabled ? 'not-allowed' : 'pointer' }}
+        onClick={() => { if (!hintDisabled) onHint(); }}
+        disabled={hintDisabled}
+      >
+        <span style={{ fontSize: 16 }}>✦</span>
+        <span>HINT</span>
+      </button>
+      <button className="kf-tap" style={actionBtn(RED)} onClick={onLobby}>
+        <span style={{ fontSize: 16 }}>⌂</span>
+        <span>LOBBY</span>
+      </button>
+    </div>
+  </Panel>
+);
 
 const ChipThemesCard: React.FC<{
   activeId: ChipSkinId; unlocked: ChipSkinId[]; onEquip: (id: ChipSkinId) => void;
@@ -216,39 +246,6 @@ const ChipThemesCard: React.FC<{
   </Panel>
 );
 
-const QuickBetCard: React.FC<{ current: number; onSfx: (n: 'chipClick' | 'hover') => void }> = ({ current, onSfx }) => {
-  const opts = [10, 20, 50, 100];
-  const [pick, setPick] = React.useState(current);
-  React.useEffect(() => setPick(current), [current]);
-  return (
-    <Panel style={{ padding: 12, minWidth: 0 }}>
-      <div style={cinzel(9, '0.28em', GOLD_INK)}>QUICK BET</div>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-        gap: 4, marginTop: 10,
-      }}>
-        {opts.map(v => {
-          const active = v === pick;
-          return (
-            <button key={v} onClick={() => { onSfx('chipClick'); setPick(v); }} className="kf-tap" style={{
-              minWidth: 0, width: '100%', textAlign: 'center',
-              padding: '10px 2px', borderRadius: 8,
-              background: active
-                ? 'linear-gradient(180deg, rgba(240,192,64,0.28), rgba(240,192,64,0.08))'
-                : 'rgba(255,255,255,0.03)',
-              border: `1px solid ${active ? GOLD : 'rgba(255,255,255,0.06)'}`,
-              color: active ? GOLD : CREAM,
-              fontFamily: DISPLAY, fontWeight: 800, fontSize: 13,
-              cursor: 'pointer', minHeight: 48,
-              overflow: 'hidden', textOverflow: 'ellipsis',
-            }}>{v}</button>
-          );
-        })}
-      </div>
-    </Panel>
-  );
-};
 
 const CurrentGameCard: React.FC<{ config: LevelConfig; sessionLabel: string }> = ({ config, sessionLabel }) => (
   <Panel style={{ padding: 16 }}>
@@ -408,8 +405,23 @@ const PlayingScreen: React.FC<PlayingScreenProps> = (p) => {
   const {
     gameState, config, isAIThinking, isMobile, isTablet, squareSize, boardPx,
     activeSkinId, unlockedSkins, sessionLabel, sideBetState,
+    muted, ambientOn,
     onSelectSquare, onResign, onEquipSkin, onSfx,
+    onToggleMute, onToggleAmbient, onGoToLobby,
   } = p;
+
+  const handleHint = React.useCallback(() => {
+    onSfx('chipClick');
+    if (gameState.isGameOver) return;
+    if (gameState.currentTurn !== 'red') return;
+    const move = gameState.allLegalMoves[0];
+    if (move) onSelectSquare(move.from);
+  }, [gameState, onSelectSquare, onSfx]);
+
+  const hintDisabled = gameState.isGameOver
+    || gameState.currentTurn !== 'red'
+    || isAIThinking
+    || gameState.allLegalMoves.length === 0;
 
   const counts = useMemo(() => getPieceCounts(gameState.board), [gameState.board]);
   const movePairs = useMemo(() => {
@@ -472,10 +484,13 @@ const PlayingScreen: React.FC<PlayingScreenProps> = (p) => {
           />
         </div>
         <ChipThemesCard activeId={activeSkinId} unlocked={unlockedSkins} onEquip={onEquipSkin} onSfx={onSfx} />
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8 }}>
-          <BetAmountCard bet={config.cost} onSfx={onSfx} />
-          <QuickBetCard current={config.cost} onSfx={onSfx} />
-        </div>
+        <GameActionsCard
+          muted={muted} ambientOn={ambientOn}
+          onMute={onToggleMute} onAmbient={onToggleAmbient}
+          onHint={handleHint} onLobby={onGoToLobby}
+          hintDisabled={hintDisabled}
+        />
+        <StakeInfoCard cost={config.cost} reward={config.reward} />
         <GameHistoryCard moves={movePairs} />
         <FoldButton onClick={onResign} disabled={gameState.isGameOver} />
       </div>
@@ -497,9 +512,14 @@ const PlayingScreen: React.FC<PlayingScreenProps> = (p) => {
         />
         <SideBetStrip sideBetState={sideBetState} />
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.35fr 1.15fr', gap: 14 }}>
-          <BetAmountCard bet={config.cost} onSfx={onSfx} />
+          <StakeInfoCard cost={config.cost} reward={config.reward} />
           <ChipThemesCard activeId={activeSkinId} unlocked={unlockedSkins} onEquip={onEquipSkin} onSfx={onSfx} />
-          <QuickBetCard current={config.cost} onSfx={onSfx} />
+          <GameActionsCard
+            muted={muted} ambientOn={ambientOn}
+            onMute={onToggleMute} onAmbient={onToggleAmbient}
+            onHint={handleHint} onLobby={onGoToLobby}
+            hintDisabled={hintDisabled}
+          />
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>

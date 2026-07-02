@@ -6,13 +6,13 @@ import {
 } from '../types/game.types';
 import { DailyBonusStatus } from '../hooks/usePoints';
 
-const GOLD = '#f0c040';
-const GOLD_INK = '#8a7a4a';
-const GREEN = '#4ade80';
-const VIOLET = '#c07ce6';
-const CREAM = '#f0e6cf';
-const PANEL_BG = 'linear-gradient(180deg, rgba(20,26,22,0.92) 0%, rgba(10,14,12,0.94) 100%)';
-const PANEL_BORDER = '1px solid rgba(240,192,64,0.18)';
+const GOLD = '#f8ce55';
+const GOLD_INK = '#c0a870';
+const GREEN = '#5ee88f';
+const VIOLET = '#d090ee';
+const CREAM = '#f5ecd6';
+const PANEL_BG = 'linear-gradient(180deg, rgba(34,42,36,0.94) 0%, rgba(20,26,22,0.96) 100%)';
+const PANEL_BORDER = '1px solid rgba(248,206,85,0.28)';
 const HEADING = "'Cinzel', serif";
 const DISPLAY = "'Playfair Display', serif";
 const BODY = "'Crimson Pro', serif";
@@ -61,7 +61,7 @@ const QuickPlayHero: React.FC<{ cfg: LevelConfig; onPlay: () => void }> = ({ cfg
       fontFamily: DISPLAY, fontWeight: 900, fontSize: 34, letterSpacing: '0.04em',
       color: CREAM, marginTop: 6, lineHeight: 1,
     }}>{cfg.label} ROOM</div>
-    <div style={{ marginTop: 8, color: 'rgba(200,190,170,0.7)', fontFamily: BODY, fontSize: 13 }}>
+    <div style={{ marginTop: 8, color: 'rgba(230,220,200,0.88)', fontFamily: BODY, fontSize: 13 }}>
       Min Bet: {cfg.cost} · Max Bet: {cfg.cost * 100}
     </div>
     <button onClick={onPlay} className="kf-tap" style={{
@@ -105,7 +105,7 @@ const ProgressiveJackpots: React.FC<{ tiers: Record<string, number> }> = ({ tier
             background: 'linear-gradient(180deg, rgba(80,15,35,0.6), rgba(40,8,20,0.75))',
             border: '1px solid rgba(240,77,92,0.25)',
           }}>
-            <div style={cap(9, '0.22em', 'rgba(200,190,170,0.6)')}>{t.label}</div>
+            <div style={cap(9, '0.22em', 'rgba(230,220,200,0.82)')}>{t.label}</div>
             <div style={{
               fontFamily: DISPLAY, fontSize: 22, fontWeight: 900, color: t.color,
               marginTop: 2,
@@ -131,7 +131,7 @@ const VipAccessBar: React.FC<{ tier: VipTier; xp: number }> = ({ tier, xp }) => 
           border: `1px solid ${tier.color}44`,
           fontFamily: HEADING, fontSize: 9, letterSpacing: '0.22em', color: tier.color, fontWeight: 700,
         }}>VIP - {tier.label.toUpperCase()}</div>
-        <div style={{ flex: 1, fontFamily: BODY, fontStyle: 'italic', color: 'rgba(200,190,170,0.7)', fontSize: 12, minWidth: 200 }}>
+        <div style={{ flex: 1, fontFamily: BODY, fontStyle: 'italic', color: 'rgba(230,220,200,0.88)', fontSize: 12, minWidth: 200 }}>
           {tier.perk}
         </div>
         <div style={cap(9, '0.14em')}>{xp.toLocaleString()} / {to.toLocaleString()} XP</div>
@@ -219,7 +219,7 @@ const DailyMissions: React.FC<{
                 }}>{done ? '✓' : tpl.icon}</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ ...cap(10, '0.15em', CREAM), fontWeight: 700 }}>{tpl.label.toUpperCase()}</div>
-                  <div style={{ fontSize: 11, color: 'rgba(200,190,170,0.7)', fontFamily: BODY }}>{tpl.hint}</div>
+                  <div style={{ fontSize: 11, color: 'rgba(230,220,200,0.88)', fontFamily: BODY }}>{tpl.hint}</div>
                 </div>
                 <div style={{ fontFamily: DISPLAY, fontSize: 14, color: GOLD, fontWeight: 800 }}>+{tpl.reward}</div>
               </div>
@@ -297,11 +297,11 @@ const RoomCards: React.FC<{
                 }}>{cfg.label}</div>
                 <div style={{ color: cfg.color, fontSize: 12 }}>◆</div>
               </div>
-              <div style={{ fontFamily: BODY, fontStyle: 'italic', color: 'rgba(240,230,207,0.7)', fontSize: 12, marginTop: 4 }}>
+              <div style={{ fontFamily: BODY, fontStyle: 'italic', color: 'rgba(245,236,214,0.9)', fontSize: 12, marginTop: 4 }}>
                 {cfg.tagline}
               </div>
               <div style={{
-                marginTop: 10, fontSize: 12, color: 'rgba(240,230,207,0.8)',
+                marginTop: 10, fontSize: 12, color: 'rgba(245,236,214,0.95)',
                 fontFamily: BODY, lineHeight: 1.35,
               }}>{cfg.description}</div>
               <div style={{
@@ -355,7 +355,7 @@ const SideBetsRow: React.FC<{
               <div style={{ ...cap(10, '0.22em', b.color), fontWeight: 700 }}>{b.label.toUpperCase()}</div>
               <div style={{ fontFamily: DISPLAY, fontSize: 12, color: GREEN, fontWeight: 800 }}>+{b.payoutMultiplier}x</div>
             </div>
-            <div style={{ fontFamily: BODY, fontSize: 11, color: 'rgba(200,190,170,0.7)', marginTop: 4, lineHeight: 1.35 }}>
+            <div style={{ fontFamily: BODY, fontSize: 11, color: 'rgba(230,220,200,0.88)', marginTop: 4, lineHeight: 1.35 }}>
               {b.hint}
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
@@ -373,9 +373,22 @@ const SideBetsRow: React.FC<{
   </Panel>
 );
 
-const AchievementsRow: React.FC<{ unlocked: string[]; isMobile: boolean }> = ({ unlocked, isMobile }) => (
+const AchievementsRow: React.FC<{ unlocked: string[]; isMobile: boolean; onOpen?: () => void }> = ({ unlocked, isMobile, onOpen }) => (
   <Panel style={{ padding: 18 }}>
-    <SectionHeader title="ACHIEVEMENTS" right={<div style={cap(9, '0.14em')}>{unlocked.length} / {ACHIEVEMENTS.length}</div>} />
+    <SectionHeader
+      title="ACHIEVEMENTS"
+      right={
+        <button
+          onClick={onOpen}
+          className="kf-tap"
+          style={{
+            background: 'transparent', border: `1px solid ${GOLD}44`,
+            borderRadius: 6, padding: '4px 10px', cursor: 'pointer',
+            color: GOLD, fontFamily: HEADING, fontSize: 9, letterSpacing: '0.18em', fontWeight: 700,
+          }}
+        >{unlocked.length} / {ACHIEVEMENTS.length} · VIEW ALL</button>
+      }
+    />
     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(5, 1fr)', gap: 10 }}>
       {ACHIEVEMENTS.slice(0, isMobile ? 6 : 5).map(a => {
         const got = unlocked.includes(a.id);
@@ -411,11 +424,14 @@ interface Props {
   onStartGame: (level: DifficultyLevel, betIds: SideBetId[]) => void;
   onSfx: (n: 'chipClick' | 'coin' | 'error' | 'hover' | 'missionComplete') => void;
   isMobile: boolean;
+  onBrowseTables?: () => void;
+  onOpenAchievements?: () => void;
 }
 
 const LobbyBody: React.FC<Props> = ({
   points, tier, dailyBonus, missions,
   onClaimDaily, onClaimMission, onStartGame, onSfx, isMobile,
+  onBrowseTables, onOpenAchievements,
 }) => {
   const [picks, setPicks] = useState<SideBetId[]>([]);
   const togglePick = (id: SideBetId) =>
@@ -449,15 +465,19 @@ const LobbyBody: React.FC<Props> = ({
         <RoomCards onSelect={start} tierNum={tier.tier} onSfx={onSfx} isMobile={isMobile} />
       </div>
 
-      <button onClick={() => onSfx('chipClick')} className="kf-tap" style={{
-        padding: '14px', borderRadius: 12,
-        background: 'linear-gradient(180deg, rgba(38,26,10,0.9), rgba(18,12,4,0.95))',
-        border: `1px solid ${GOLD}44`,
-        color: GOLD, cursor: 'pointer',
-        fontFamily: HEADING, fontSize: 11, letterSpacing: '0.28em', fontWeight: 800,
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-        minHeight: 44,
-      }}>⛃ BROWSE ALL TABLES</button>
+      <button
+        onClick={() => { onSfx('chipClick'); onBrowseTables?.(); }}
+        className="kf-tap"
+        style={{
+          padding: '14px', borderRadius: 12,
+          background: 'linear-gradient(180deg, rgba(38,26,10,0.9), rgba(18,12,4,0.95))',
+          border: `1px solid ${GOLD}44`,
+          color: GOLD, cursor: 'pointer',
+          fontFamily: HEADING, fontSize: 11, letterSpacing: '0.28em', fontWeight: 800,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+          minHeight: 44,
+        }}
+      >⛃ BROWSE ALL TABLES</button>
 
       <div style={{
         display: 'grid',
@@ -465,7 +485,7 @@ const LobbyBody: React.FC<Props> = ({
         gap: 14,
       }}>
         <SideBetsRow picks={picks} onToggle={togglePick} onSfx={onSfx} isMobile={isMobile} />
-        <AchievementsRow unlocked={points.unlockedAchievements} isMobile={isMobile} />
+        <AchievementsRow unlocked={points.unlockedAchievements} isMobile={isMobile} onOpen={onOpenAchievements} />
       </div>
     </div>
   );

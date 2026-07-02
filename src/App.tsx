@@ -24,11 +24,16 @@ import ParticleBurst from './components/ParticleBurst';
 import AgeGate from './components/AgeGate';
 import PlayingScreen from './components/PlayingScreen';
 import CasinoChrome from './components/CasinoChrome';
+import {
+  ModalKey, MissionsModal, VipModal, LeaderboardModal, StoreModal,
+  PromotionsModal, CashierModal, TablesModal, AchievementsModal,
+} from './components/LobbyModals';
 
 const App: React.FC = () => {
   const [screen, setScreen] = useState<GameScreen>('lobby');
   const [activeConfig, setActiveConfig] = useState<LevelConfig>(LEVEL_CONFIGS.easy);
   const [gameResult, setGameResult] = useState<GameResult | null>(null);
+  const [activeModal, setActiveModal] = useState<ModalKey>(null);
   const [isAIThinking, setIsAIThinking] = useState(false);
   const [sideBetState, setSideBetState] = useState<SideBetState>(makeInitialSideBetState);
   const [burstSeq, setBurstSeq] = useState<{ n: number; x: number; y: number; color: string; count: number }>({
@@ -305,20 +310,93 @@ const App: React.FC = () => {
     m => !m.claimed && m.progress < m.target
   ).length;
 
+  const openModal = useCallback((k: ModalKey) => {
+    play('chipClick');
+    setActiveModal(k);
+  }, [play]);
+
+  const handleQuickPlay = useCallback(() => {
+    const quickLevel: DifficultyLevel = tier.tier >= 1 ? 'medium' : 'easy';
+    beginRound(LEVEL_CONFIGS[quickLevel], []);
+  }, [beginRound, tier.tier]);
+
   const chromeProps = {
     points, muted, isMobile,
     onToggleMute: toggleMute,
-    onCashier: () => { play('coin'); if (screen !== 'lobby') setScreen('lobby'); },
+    onCashier: () => { play('coin'); setActiveModal('cashier'); },
     tier, dailyBonus,
     missionsCount: missionsPendingCount,
     onClaimDaily: handleClaimDaily,
     onNav: (k: 'play' | 'missions' | 'vip' | 'leaderboard' | 'store' | 'promotions') => {
-      if (k === 'play' && screen === 'playing') return;
-      setScreen('lobby');
+      if (k === 'play') {
+        setActiveModal(null);
+        if (screen !== 'playing') setScreen('lobby');
+        return;
+      }
+      setActiveModal(k);
     },
+    onQuickPlay: handleQuickPlay,
+    onOpenPromotions: () => setActiveModal('promotions'),
     onSfx: (n: 'chipClick' | 'coin' | 'error' | 'hover') => play(n),
     activeNav: (screen === 'playing' ? 'play' : 'play') as 'play',
   };
+
+  const modalOverlay = (
+    <>
+      {activeModal === 'missions' && (
+        <MissionsModal
+          missions={missions.state}
+          onClaim={handleClaimMission}
+          onReroll={() => { play('chipClick'); missions.reroll(); }}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
+      {activeModal === 'vip' && (
+        <VipModal tier={tier} points={points} onClose={() => setActiveModal(null)} />
+      )}
+      {activeModal === 'leaderboard' && (
+        <LeaderboardModal points={points} onClose={() => setActiveModal(null)} />
+      )}
+      {activeModal === 'store' && (
+        <StoreModal
+          points={points} tier={tier}
+          onEquip={(id) => { play('skinUnlock'); equipSkin(id); showToast('◆', `EQUIPPED ${id.toUpperCase()}`, '#c07ce6'); }}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
+      {activeModal === 'promotions' && (
+        <PromotionsModal
+          dailyBonus={dailyBonus}
+          onClaimDaily={() => { handleClaimDaily(); setActiveModal(null); }}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
+      {activeModal === 'cashier' && (
+        <CashierModal
+          points={points}
+          onAddChips={(n) => {
+            addChips(n);
+            fireBurst('#f0c040', 40);
+            showToast('⛃', `+${n.toLocaleString()} CHIPS`, '#f0c040');
+          }}
+          onReset={() => { resetPoints(); showToast('↻', 'PROGRESS RESET', '#f04d5c'); }}
+          onClose={() => setActiveModal(null)}
+          onSfx={(n) => play(n)}
+        />
+      )}
+      {activeModal === 'tables' && (
+        <TablesModal
+          points={points} tier={tier}
+          onPlay={(level) => { setActiveModal(null); handleStartGame(level, []); }}
+          onSfx={(n) => play(n)}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
+      {activeModal === 'achievements' && (
+        <AchievementsModal points={points} onClose={() => setActiveModal(null)} />
+      )}
+    </>
+  );
 
   // ── Lobby ──────────────────────────────────────────────────────────────────
   if (screen === 'lobby') {
@@ -335,8 +413,11 @@ const App: React.FC = () => {
             onStartGame={handleStartGame}
             onSfx={lobbySfx}
             isMobile={isMobile}
+            onBrowseTables={() => setActiveModal('tables')}
+            onOpenAchievements={() => setActiveModal('achievements')}
           />
         </CasinoChrome>
+        {modalOverlay}
         <ParticleBurst trigger={burstSeq.n} x={burstSeq.x} y={burstSeq.y} color={burstSeq.color} count={burstSeq.count} />
         {toast && (
           <div key={toast.id} className="kf-toast" style={{ borderColor: `${toast.color}88` }}>
@@ -362,6 +443,7 @@ const App: React.FC = () => {
             onSfx={resultSfx}
           />
         </CasinoChrome>
+        {modalOverlay}
         <ParticleBurst trigger={burstSeq.n} x={burstSeq.x} y={burstSeq.y} color={burstSeq.color} count={burstSeq.count} />
         {toast && (
           <div key={toast.id} className="kf-toast" style={{ borderColor: `${toast.color}88` }}>
@@ -406,7 +488,14 @@ const App: React.FC = () => {
         onSfx={(n) => play(n)}
       />
       </CasinoChrome>
+      {modalOverlay}
       <ParticleBurst trigger={burstSeq.n} x={burstSeq.x} y={burstSeq.y} color={burstSeq.color} count={burstSeq.count} />
+      {toast && (
+        <div key={toast.id} className="kf-toast" style={{ borderColor: `${toast.color}88` }}>
+          <span style={{ color: toast.color, fontSize: 18 }}>{toast.icon}</span>
+          <span style={{ color: '#f0e6cf' }}>{toast.label}</span>
+        </div>
+      )}
       {session.activeNudge && <CoolOffNudge minutes={session.activeNudge} onDismiss={session.dismissNudge} />}
     </>
   );

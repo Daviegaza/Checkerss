@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ChipCounter from './ChipCounter';
 import { PointsState, VipTier, nextVipTier } from '../types/game.types';
 import { DailyBonusStatus } from '../hooks/usePoints';
 
-const GOLD = '#f0c040';
-const GOLD_INK = '#8a7a4a';
-const GREEN = '#4ade80';
-const RED = '#f04d5c';
-const PINK = '#ff8ea0';
-const VIOLET = '#c07ce6';
-const CREAM = '#f0e6cf';
-const PANEL_BG = 'linear-gradient(180deg, rgba(20,26,22,0.92) 0%, rgba(10,14,12,0.94) 100%)';
-const PANEL_BORDER = '1px solid rgba(240,192,64,0.18)';
+const GOLD = '#f8ce55';
+const GOLD_INK = '#c0a870';
+const GREEN = '#5ee88f';
+const RED = '#ff5a6c';
+const PINK = '#ff9db0';
+const VIOLET = '#d090ee';
+const CREAM = '#f5ecd6';
+const PANEL_BG = 'linear-gradient(180deg, rgba(34,42,36,0.94) 0%, rgba(20,26,22,0.96) 100%)';
+const PANEL_BORDER = '1px solid rgba(248,206,85,0.28)';
 const HEADING = "'Cinzel', serif";
 const DISPLAY = "'Playfair Display', serif";
 const BODY = "'Crimson Pro', serif";
@@ -48,6 +48,8 @@ interface Props {
   onNav?: (key: NavKey) => void;
   onClaimDaily?: () => void;
   onSfx?: (name: 'chipClick' | 'coin' | 'error' | 'hover') => void;
+  onQuickPlay?: () => void;
+  onOpenPromotions?: () => void;
 }
 
 const Panel: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
@@ -183,9 +185,12 @@ const DailyBonusCard: React.FC<{ status: DailyBonusStatus; onClaim: () => void; 
   );
 };
 
-const WeekendBoostCard: React.FC<{ onSfx?: (n: 'chipClick' | 'coin' | 'error' | 'hover') => void }> = ({ onSfx }) => (
+const WeekendBoostCard: React.FC<{
+  onSfx?: (n: 'chipClick' | 'coin' | 'error' | 'hover') => void;
+  onOpen?: () => void;
+}> = ({ onSfx, onOpen }) => (
   <button
-    onClick={() => onSfx?.('chipClick')}
+    onClick={() => { onSfx?.('chipClick'); onOpen?.(); }}
     className="kf-tap"
     style={{
       padding: 12, cursor: 'pointer', textAlign: 'left', width: '100%',
@@ -226,20 +231,38 @@ function formatDuration(ms: number): string {
 const CasinoChrome: React.FC<Props> = ({
   points, muted, isMobile, onToggleMute, onCashier, children,
   tier, dailyBonus, missionsCount, activeNav, onNav, onClaimDaily, onSfx,
+  onQuickPlay, onOpenPromotions,
 }) => {
   const bg =
-    'radial-gradient(ellipse at 12% 8%, rgba(240,192,64,0.10) 0%, transparent 55%),' +
-    'radial-gradient(ellipse at 88% 12%, rgba(74,222,128,0.10) 0%, transparent 55%),' +
-    'radial-gradient(ellipse at 50% 100%, rgba(240,192,64,0.06) 0%, transparent 45%),' +
-    'linear-gradient(180deg, #050403 0%, #0a0806 100%)';
+    'radial-gradient(ellipse at 12% 8%, rgba(248,206,85,0.18) 0%, transparent 55%),' +
+    'radial-gradient(ellipse at 88% 12%, rgba(94,232,143,0.16) 0%, transparent 55%),' +
+    'radial-gradient(ellipse at 50% 100%, rgba(248,206,85,0.10) 0%, transparent 45%),' +
+    'linear-gradient(180deg, #16201c 0%, #0e1512 100%)';
 
   const [localNav, setLocalNav] = useState<NavKey>(activeNav ?? 'play');
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [tabBarVisible, setTabBarVisible] = useState(true);
+  const lastScrollY = useRef(0);
   const currentNav = activeNav ?? localNav;
+
+  useEffect(() => {
+    if (!isMobile) return;
+    const onScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastScrollY.current;
+      if (y < 24) setTabBarVisible(true);
+      else if (delta > 6) setTabBarVisible(false);
+      else if (delta < -6) setTabBarVisible(true);
+      lastScrollY.current = y;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [isMobile]);
 
   const handleNav = (k: NavKey) => {
     onSfx?.('chipClick');
     setLocalNav(k);
+    setDrawerOpen(false);
     onNav?.(k);
   };
 
@@ -261,7 +284,7 @@ const CasinoChrome: React.FC<Props> = ({
       </Panel>
       <VipCard tier={tier} xp={points.vipXp} />
       {onClaimDaily && <DailyBonusCard status={dailyBonus} onClaim={onClaimDaily} onSfx={onSfx} />}
-      <WeekendBoostCard onSfx={onSfx} />
+      <WeekendBoostCard onSfx={onSfx} onOpen={onOpenPromotions} />
     </div>
   ) : null;
 
@@ -371,7 +394,7 @@ const CasinoChrome: React.FC<Props> = ({
       </div>
 
       {isMobile ? (
-        <div style={{ flex: 1 }}>{children}</div>
+        <div style={{ flex: 1, paddingBottom: `calc(84px + var(--kf-safe-bottom))` }}>{children}</div>
       ) : (
         <div style={{
           flex: 1,
@@ -385,27 +408,35 @@ const CasinoChrome: React.FC<Props> = ({
         </div>
       )}
 
-      {/* Mobile bottom tab bar */}
+      {/* Mobile bottom tab bar — floating, hides on scroll-down */}
       {isMobile && (
-        <div className="kf-glass kf-safe-bottom" style={{
-          position: 'sticky', bottom: 0, zIndex: 50,
-          borderTop: '1px solid rgba(240,192,64,0.2)',
-          borderBottom: 'none',
-          padding: '6px 4px',
+        <div className="kf-glass" style={{
+          position: 'fixed',
+          left: 12, right: 12,
+          bottom: `calc(12px + var(--kf-safe-bottom))`,
+          zIndex: 50,
+          border: '1px solid rgba(240,192,64,0.28)',
+          borderRadius: 20,
+          padding: '6px 6px',
           display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 2,
+          boxShadow: '0 14px 40px rgba(0,0,0,0.65), 0 0 20px rgba(240,192,64,0.12), inset 0 1px 0 rgba(255,255,255,0.05)',
+          transform: tabBarVisible ? 'translateY(0)' : 'translateY(calc(100% + 24px))',
+          opacity: tabBarVisible ? 1 : 0,
+          transition: 'transform 0.28s cubic-bezier(0.2,1.1,0.4,1), opacity 0.22s ease',
+          pointerEvents: tabBarVisible ? 'auto' : 'none',
         }}>
           {([
-            { key: 'home',     icon: '⌂', label: 'HOME',     nav: 'play' as NavKey,        big: false },
-            { key: 'play',     icon: '♟', label: 'PLAY',     nav: 'play' as NavKey,        big: false },
-            { key: 'quick',    icon: '♛', label: 'QUICK',    nav: 'play' as NavKey,        big: true  },
-            { key: 'jackpots', icon: '★', label: 'JACKPOTS', nav: 'promotions' as NavKey,  big: false },
-            { key: 'profile',  icon: '☺', label: 'PROFILE',  nav: 'vip' as NavKey,         big: false },
+            { key: 'home',     icon: '⌂', label: 'HOME',     nav: 'play' as NavKey,        big: false, action: () => handleNav('play') },
+            { key: 'missions', icon: '♛', label: 'MISSIONS', nav: 'missions' as NavKey,    big: false, action: () => handleNav('missions') },
+            { key: 'quick',    icon: '♟', label: 'QUICK',    nav: 'play' as NavKey,        big: true,  action: () => { onSfx?.('chipClick'); onQuickPlay?.(); } },
+            { key: 'jackpots', icon: '★', label: 'JACKPOTS', nav: 'promotions' as NavKey,  big: false, action: () => handleNav('promotions') },
+            { key: 'profile',  icon: '☺', label: 'PROFILE',  nav: 'vip' as NavKey,         big: false, action: () => handleNav('vip') },
           ]).map(t => {
             const active = currentNav === t.nav || (t.big && currentNav === 'play');
             return (
               <button
                 key={t.key}
-                onClick={() => handleNav(t.nav)}
+                onClick={t.action}
                 className="kf-tap"
                 style={{
                   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
