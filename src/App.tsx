@@ -40,13 +40,13 @@ const App: React.FC = () => {
   const [burstSeq, setBurstSeq] = useState<{ n: number; x: number; y: number; color: string; count: number }>({
     n: -1, x: 0, y: 0, color: '#f0c040', count: 30,
   });
-  const [toast, setToast] = useState<{ id: number; icon: string; label: string; color: string } | null>(null);
+  const [toasts, setToasts] = useState<{ id: number; icon: string; label: string; color: string }[]>([]);
   const toastCounter = useRef(0);
   const showToast = useCallback((icon: string, label: string, color = '#f0c040') => {
     toastCounter.current += 1;
     const id = toastCounter.current;
-    setToast({ id, icon, label, color });
-    setTimeout(() => setToast(cur => (cur?.id === id ? null : cur)), 2400);
+    setToasts(cur => [...cur.slice(-2), { id, icon, label, color }]);
+    setTimeout(() => setToasts(cur => cur.filter(t => t.id !== id)), 2600);
   }, []);
   const resultHandled = useRef(false);
 
@@ -489,10 +489,14 @@ const App: React.FC = () => {
         {modalOverlay}
         {tabQuitConfirmOverlay}
         <ParticleBurst trigger={burstSeq.n} x={burstSeq.x} y={burstSeq.y} color={burstSeq.color} count={burstSeq.count} />
-        {toast && (
-          <div key={toast.id} className="kf-toast" style={{ borderColor: `${toast.color}88` }}>
-            <span style={{ color: toast.color, fontSize: 18 }}>{toast.icon}</span>
-            <span style={{ color: '#f0e6cf' }}>{toast.label}</span>
+        {toasts.length > 0 && (
+          <div className="kf-toast-stack">
+            {toasts.map(t => (
+              <div key={t.id} className="kf-toast" style={{ borderColor: `${t.color}88` }}>
+                <span style={{ color: t.color, fontSize: 18 }}>{t.icon}</span>
+                <span style={{ color: '#f0e6cf' }}>{t.label}</span>
+              </div>
+            ))}
           </div>
         )}
         {session.activeNudge && (
@@ -516,10 +520,14 @@ const App: React.FC = () => {
         {modalOverlay}
         {tabQuitConfirmOverlay}
         <ParticleBurst trigger={burstSeq.n} x={burstSeq.x} y={burstSeq.y} color={burstSeq.color} count={burstSeq.count} />
-        {toast && (
-          <div key={toast.id} className="kf-toast" style={{ borderColor: `${toast.color}88` }}>
-            <span style={{ color: toast.color, fontSize: 18 }}>{toast.icon}</span>
-            <span style={{ color: '#f0e6cf' }}>{toast.label}</span>
+        {toasts.length > 0 && (
+          <div className="kf-toast-stack">
+            {toasts.map(t => (
+              <div key={t.id} className="kf-toast" style={{ borderColor: `${t.color}88` }}>
+                <span style={{ color: t.color, fontSize: 18 }}>{t.icon}</span>
+                <span style={{ color: '#f0e6cf' }}>{t.label}</span>
+              </div>
+            ))}
           </div>
         )}
       </>
@@ -562,10 +570,14 @@ const App: React.FC = () => {
       {modalOverlay}
       {tabQuitConfirmOverlay}
       <ParticleBurst trigger={burstSeq.n} x={burstSeq.x} y={burstSeq.y} color={burstSeq.color} count={burstSeq.count} />
-      {toast && (
-        <div key={toast.id} className="kf-toast" style={{ borderColor: `${toast.color}88` }}>
-          <span style={{ color: toast.color, fontSize: 18 }}>{toast.icon}</span>
-          <span style={{ color: '#f0e6cf' }}>{toast.label}</span>
+      {toasts.length > 0 && (
+        <div className="kf-toast-stack">
+          {toasts.map(t => (
+            <div key={t.id} className="kf-toast" style={{ borderColor: `${t.color}88` }}>
+              <span style={{ color: t.color, fontSize: 18 }}>{t.icon}</span>
+              <span style={{ color: '#f0e6cf' }}>{t.label}</span>
+            </div>
+          ))}
         </div>
       )}
       {session.activeNudge && <CoolOffNudge minutes={session.activeNudge} onDismiss={session.dismissNudge} />}

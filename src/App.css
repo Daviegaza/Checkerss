@@ -328,9 +328,6 @@ body {
   100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
 }
 .kf-toast {
-  position: fixed; top: calc(70px + var(--kf-safe-top));
-  left: 50%; transform: translateX(-50%);
-  z-index: 500;
   padding: 12px 18px; border-radius: 12px;
   background: linear-gradient(180deg, rgba(60,40,10,0.96), rgba(30,20,5,0.98));
   border: 1px solid rgba(240,192,64,0.55);
