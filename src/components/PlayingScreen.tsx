@@ -404,8 +404,41 @@ const PlayingScreen: React.FC<PlayingScreenProps> = (p) => {
     activeSkinId, unlockedSkins, sessionLabel, sideBetState,
     muted, ambientOn,
     onSelectSquare, onResign, onEquipSkin, onSfx,
-    onToggleMute, onToggleAmbient,
+    onToggleMute, onToggleAmbient, onGoToLobby,
   } = p;
+
+  const BackBar: React.FC = () => (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      gap: 10, padding: '2px 2px 4px', width: '100%',
+    }}>
+      <button
+        onClick={() => { onSfx('chipClick'); onGoToLobby(); }}
+        className="kf-tap"
+        aria-label="Back to lobby"
+        style={{
+          width: 40, height: 40, borderRadius: 10, cursor: 'pointer',
+          background: 'rgba(240,192,64,0.10)',
+          border: `1px solid ${GOLD}44`,
+          color: GOLD, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0,
+        }}
+      >
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M11 3L5 9l6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+      <div style={{
+        padding: '8px 20px', borderRadius: 999,
+        background: PANEL_BG, border: PANEL_BORDER,
+      }}>
+        <div style={{
+          fontFamily: HEADING, fontSize: 11, fontWeight: 700, letterSpacing: '0.28em', color: GOLD,
+        }}>{config.label} · {config.tagline}</div>
+      </div>
+      <div style={{ width: 40, height: 40 }} />
+    </div>
+  );
 
   const handleHint = React.useCallback(() => {
     onSfx('chipClick');
@@ -443,6 +476,7 @@ const PlayingScreen: React.FC<PlayingScreenProps> = (p) => {
         color: CREAM, width: '100%', maxWidth: '100%', overflowX: 'hidden', minWidth: 0,
         alignItems: 'stretch', justifyContent: 'flex-start', boxSizing: 'border-box',
       }}>
+        <BackBar />
         <BoardShell
           gameState={gameState} config={config}
           onSelectSquare={onSelectSquare} isAITurn={isAITurn}
