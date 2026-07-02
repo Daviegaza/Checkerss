@@ -180,13 +180,13 @@ const actionBtn = (accent: string, active = false): React.CSSProperties => ({
 const GameActionsCard: React.FC<{
   muted: boolean; ambientOn: boolean;
   onMute: () => void; onAmbient: () => void;
-  onHint: () => void; onLobby: () => void;
+  onHint: () => void;
   onFold: () => void;
   hintDisabled: boolean; foldDisabled: boolean;
-}> = ({ muted, ambientOn, onMute, onAmbient, onHint, onLobby, onFold, hintDisabled, foldDisabled }) => (
+}> = ({ muted, ambientOn, onMute, onAmbient, onHint, onFold, hintDisabled, foldDisabled }) => (
   <Panel style={{ padding: 12, minWidth: 0 }}>
     <div style={cinzel(9, '0.28em', GOLD_INK)}>QUICK ACTIONS</div>
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 6, marginTop: 10 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 6, marginTop: 10 }}>
       <button className="kf-tap" style={actionBtn(GOLD, !muted)} onClick={onMute}>
         <span style={{ fontSize: 16 }}>{muted ? '♪̸' : '♪'}</span>
         <span>{muted ? 'MUTED' : 'SOUND'}</span>
@@ -203,10 +203,6 @@ const GameActionsCard: React.FC<{
       >
         <span style={{ fontSize: 16 }}>✦</span>
         <span>HINT</span>
-      </button>
-      <button className="kf-tap" style={actionBtn('#c0a870')} onClick={onLobby}>
-        <span style={{ fontSize: 16 }}>⌂</span>
-        <span>LOBBY</span>
       </button>
       <button
         className="kf-tap"
@@ -408,7 +404,7 @@ const PlayingScreen: React.FC<PlayingScreenProps> = (p) => {
     activeSkinId, unlockedSkins, sessionLabel, sideBetState,
     muted, ambientOn,
     onSelectSquare, onResign, onEquipSkin, onSfx,
-    onToggleMute, onToggleAmbient, onGoToLobby,
+    onToggleMute, onToggleAmbient,
   } = p;
 
   const handleHint = React.useCallback(() => {
@@ -488,7 +484,7 @@ const PlayingScreen: React.FC<PlayingScreenProps> = (p) => {
         <GameActionsCard
           muted={muted} ambientOn={ambientOn}
           onMute={onToggleMute} onAmbient={onToggleAmbient}
-          onHint={handleHint} onLobby={onGoToLobby}
+          onHint={handleHint}
           onFold={onResign}
           hintDisabled={hintDisabled}
           foldDisabled={gameState.isGameOver}
@@ -519,7 +515,7 @@ const PlayingScreen: React.FC<PlayingScreenProps> = (p) => {
           <GameActionsCard
             muted={muted} ambientOn={ambientOn}
             onMute={onToggleMute} onAmbient={onToggleAmbient}
-            onHint={handleHint} onLobby={onGoToLobby}
+            onHint={handleHint}
             onFold={onResign}
             hintDisabled={hintDisabled}
             foldDisabled={gameState.isGameOver}

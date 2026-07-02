@@ -240,7 +240,6 @@ const CasinoChrome: React.FC<Props> = ({
     'linear-gradient(180deg, #16201c 0%, #0e1512 100%)';
 
   const [localNav, setLocalNav] = useState<NavKey>(activeNav ?? 'play');
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [tabBarVisible, setTabBarVisible] = useState(true);
   const lastScrollY = useRef(0);
   const currentNav = activeNav ?? localNav;
@@ -262,7 +261,6 @@ const CasinoChrome: React.FC<Props> = ({
   const handleNav = (k: NavKey) => {
     onSfx?.('chipClick');
     setLocalNav(k);
-    setDrawerOpen(false);
     onNav?.(k);
   };
 
@@ -301,18 +299,10 @@ const CasinoChrome: React.FC<Props> = ({
         padding: isMobile ? '6px 8px' : '12px 20px',
       }}>
         {isMobile && (
-          <>
-            <button onClick={() => setDrawerOpen(true)} className="kf-tap" title="Menu" style={{
-              width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-              background: 'rgba(240,192,64,0.10)', border: `1px solid ${GOLD}44`,
-              color: GOLD, fontSize: 18, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>☰</button>
-            <div className="kf-shimmer-gold" style={{
-              fontFamily: DISPLAY, fontWeight: 900, fontSize: 18,
-              letterSpacing: '0.04em', flexShrink: 0,
-            }}>KINGFALL</div>
-          </>
+          <div className="kf-shimmer-gold" style={{
+            fontFamily: DISPLAY, fontWeight: 900, fontSize: 20,
+            letterSpacing: '0.04em', flexShrink: 0, paddingLeft: 4,
+          }}>KINGFALL</div>
         )}
         {!isMobile && <div style={{ width: 260 - 40 }} />}
 
@@ -426,7 +416,7 @@ const CasinoChrome: React.FC<Props> = ({
           pointerEvents: tabBarVisible ? 'auto' : 'none',
         }}>
           {([
-            { key: 'home',     icon: '⌂', label: 'HOME',     nav: 'play' as NavKey,        big: false, action: () => handleNav('play') },
+            { key: 'lobby',    icon: '⌂', label: 'LOBBY',    nav: 'play' as NavKey,        big: false, action: () => handleNav('play') },
             { key: 'missions', icon: '♛', label: 'MISSIONS', nav: 'missions' as NavKey,    big: false, action: () => handleNav('missions') },
             { key: 'quick',    icon: '♟', label: 'QUICK',    nav: 'play' as NavKey,        big: true,  action: () => { onSfx?.('chipClick'); onQuickPlay?.(); } },
             { key: 'jackpots', icon: '★', label: 'JACKPOTS', nav: 'promotions' as NavKey,  big: false, action: () => handleNav('promotions') },
@@ -457,39 +447,6 @@ const CasinoChrome: React.FC<Props> = ({
               </button>
             );
           })}
-        </div>
-      )}
-
-      {/* Mobile drawer overlay */}
-      {isMobile && drawerOpen && (
-        <div
-          onClick={() => setDrawerOpen(false)}
-          style={{
-            position: 'fixed', inset: 0, zIndex: 100,
-            background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(6px)',
-            display: 'flex',
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: 'min(80vw, 320px)', height: '100%',
-              background: 'linear-gradient(180deg, rgba(20,26,22,0.98), rgba(6,10,8,0.98))',
-              borderRight: `1px solid ${GOLD}44`,
-              padding: 'calc(20px + var(--kf-safe-top)) 12px 12px',
-              overflowY: 'auto',
-              boxShadow: '20px 0 60px rgba(0,0,0,0.7)',
-            }}
-          >
-            {Sidebar}
-            <button onClick={onToggleMute} className="kf-tap" style={{
-              width: '100%', marginTop: 14, padding: '12px',
-              background: 'rgba(240,192,64,0.10)', border: `1px solid ${GOLD}44`,
-              borderRadius: 10, color: muted ? GOLD_INK : GOLD,
-              fontFamily: HEADING, fontSize: 11, letterSpacing: '0.22em', fontWeight: 700,
-              cursor: 'pointer', minHeight: 44,
-            }}>{muted ? '♪̸ SOUND OFF' : '♪ SOUND ON'}</button>
-          </div>
         </div>
       )}
 

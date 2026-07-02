@@ -48,7 +48,7 @@ export function useSoundFX(): UseSoundFXReturn {
   const ensureBus = useCallback((ctx: AudioContext) => {
     if (busRef.current) return busRef.current;
     const master = ctx.createGain();
-    master.gain.value = 0.85;
+    master.gain.value = 1.15;
     const comp = ctx.createDynamicsCompressor();
     comp.threshold.value = -18;
     comp.knee.value = 24;
@@ -202,16 +202,18 @@ export function useSoundFX(): UseSoundFXReturn {
         chime(ctx, 1170, 0.14, 0.06, 0.04);
         break;
       case 'move':
-        // wooden click on felt
-        beep(ctx, 520, 0.08, 'triangle', 0.09);
-        beep(ctx, 780, 0.05, 'triangle', 0.05, 0.01);
-        noise(ctx, 0.04, 2200, 0.03, 0);
+        // wooden click on felt — boosted for game-play audibility
+        beep(ctx, 520, 0.10, 'triangle', 0.18);
+        beep(ctx, 780, 0.06, 'triangle', 0.10, 0.01);
+        beep(ctx, 320, 0.09, 'sine', 0.09, 0.005);
+        noise(ctx, 0.05, 2200, 0.06, 0);
         break;
       case 'capture':
-        // clatter + chip sweep
-        beep(ctx, 260, 0.18, 'sawtooth', 0.15, 0, 90);
-        noise(ctx, 0.14, 900, 0.08, 0);
-        chime(ctx, 1500, 0.14, 0.06, 0.08);
+        // clatter + chip sweep — punchier
+        beep(ctx, 260, 0.22, 'sawtooth', 0.24, 0, 90);
+        noise(ctx, 0.18, 900, 0.14, 0);
+        chime(ctx, 1500, 0.18, 0.12, 0.08);
+        chime(ctx, 900, 0.14, 0.10, 0);
         break;
       case 'kingMe':
         // triumphant crown fanfare with bell tail

@@ -34,6 +34,7 @@ const App: React.FC = () => {
   const [activeConfig, setActiveConfig] = useState<LevelConfig>(LEVEL_CONFIGS.easy);
   const [gameResult, setGameResult] = useState<GameResult | null>(null);
   const [activeModal, setActiveModal] = useState<ModalKey>(null);
+  const [showTabQuitConfirm, setShowTabQuitConfirm] = useState(false);
   const [isAIThinking, setIsAIThinking] = useState(false);
   const [sideBetState, setSideBetState] = useState<SideBetState>(makeInitialSideBetState);
   const [burstSeq, setBurstSeq] = useState<{ n: number; x: number; y: number; color: string; count: number }>({
@@ -330,7 +331,11 @@ const App: React.FC = () => {
     onNav: (k: 'play' | 'missions' | 'vip' | 'leaderboard' | 'store' | 'promotions') => {
       if (k === 'play') {
         setActiveModal(null);
-        if (screen !== 'playing') setScreen('lobby');
+        if (screen === 'playing' && !gameState.isGameOver) {
+          setShowTabQuitConfirm(true);
+        } else {
+          setScreen('lobby');
+        }
         return;
       }
       setActiveModal(k);
@@ -340,6 +345,70 @@ const App: React.FC = () => {
     onSfx: (n: 'chipClick' | 'coin' | 'error' | 'hover') => play(n),
     activeNav: (screen === 'playing' ? 'play' : 'play') as 'play',
   };
+
+  const tabQuitConfirmOverlay = showTabQuitConfirm ? (
+    <div
+      onClick={() => setShowTabQuitConfirm(false)}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 450,
+        background: 'rgba(10,15,12,0.62)',
+        backdropFilter: 'blur(12px) saturate(1.1)',
+        WebkitBackdropFilter: 'blur(12px) saturate(1.1)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: 'min(420px, 100%)', padding: 24, borderRadius: 18,
+          background:
+            'radial-gradient(ellipse at 0% 0%, rgba(255,90,108,0.16) 0%, transparent 60%),' +
+            'linear-gradient(180deg, rgba(38,46,40,0.98), rgba(22,30,26,0.98))',
+          border: '1px solid rgba(255,90,108,0.5)',
+          boxShadow: '0 24px 80px rgba(0,0,0,0.8), 0 0 40px rgba(255,90,108,0.18)',
+          textAlign: 'center',
+        }}
+      >
+        <div style={{ fontSize: 36, color: '#ff5a6c', marginBottom: 6 }}>⚑</div>
+        <div style={{
+          fontFamily: "'Cinzel', serif", fontSize: 14, letterSpacing: '0.28em',
+          color: '#ff5a6c', fontWeight: 900,
+        }}>QUIT ROUND?</div>
+        <div style={{
+          fontFamily: "'Crimson Pro', serif", fontSize: 14, color: '#f5ecd6',
+          marginTop: 10, lineHeight: 1.5,
+        }}>
+          You'll forfeit this hand and lose your buy-in. The felt will be waiting when you return.
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 20 }}>
+          <button
+            onClick={() => { play('chipClick'); setShowTabQuitConfirm(false); }}
+            className="kf-tap"
+            style={{
+              padding: 14, borderRadius: 12, cursor: 'pointer',
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(248,206,85,0.5)',
+              color: '#f8ce55',
+              fontFamily: "'Cinzel', serif", fontSize: 12, letterSpacing: '0.24em', fontWeight: 800,
+              minHeight: 52,
+            }}
+          >NO · KEEP PLAYING</button>
+          <button
+            onClick={() => { setShowTabQuitConfirm(false); setScreen('lobby'); }}
+            className="kf-tap"
+            style={{
+              padding: 14, borderRadius: 12, cursor: 'pointer',
+              background: 'linear-gradient(180deg, #ff5a6c, #a02030)',
+              border: '1px solid #ff5a6c',
+              color: '#fff',
+              fontFamily: "'Cinzel', serif", fontSize: 12, letterSpacing: '0.24em', fontWeight: 900,
+              minHeight: 52, boxShadow: '0 8px 22px rgba(255,90,108,0.4)',
+            }}
+          >YES · QUIT</button>
+        </div>
+      </div>
+    </div>
+  ) : null;
 
   const modalOverlay = (
     <>
@@ -418,6 +487,7 @@ const App: React.FC = () => {
           />
         </CasinoChrome>
         {modalOverlay}
+        {tabQuitConfirmOverlay}
         <ParticleBurst trigger={burstSeq.n} x={burstSeq.x} y={burstSeq.y} color={burstSeq.color} count={burstSeq.count} />
         {toast && (
           <div key={toast.id} className="kf-toast" style={{ borderColor: `${toast.color}88` }}>
@@ -444,6 +514,7 @@ const App: React.FC = () => {
           />
         </CasinoChrome>
         {modalOverlay}
+        {tabQuitConfirmOverlay}
         <ParticleBurst trigger={burstSeq.n} x={burstSeq.x} y={burstSeq.y} color={burstSeq.color} count={burstSeq.count} />
         {toast && (
           <div key={toast.id} className="kf-toast" style={{ borderColor: `${toast.color}88` }}>
@@ -489,6 +560,7 @@ const App: React.FC = () => {
       />
       </CasinoChrome>
       {modalOverlay}
+      {tabQuitConfirmOverlay}
       <ParticleBurst trigger={burstSeq.n} x={burstSeq.x} y={burstSeq.y} color={burstSeq.color} count={burstSeq.count} />
       {toast && (
         <div key={toast.id} className="kf-toast" style={{ borderColor: `${toast.color}88` }}>
