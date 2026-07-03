@@ -39,9 +39,17 @@ const Square: React.FC<SquareProps> = ({
     else if (isCapture)      bg = '#a02040';
   }
 
+  const squareClasses = [
+    'kf-square-3d',
+    isLastMoveTo || isLastMoveFrom ? 'kf-last-move' : '',
+    isLegalDest && isDark && !piece ? 'kf-valid-move' : '',
+    isLegalDest && isDark && piece ? 'kf-valid-capture' : '',
+  ].filter(Boolean).join(' ');
+
   return (
     <div
       onClick={handleClick}
+      className={squareClasses}
       style={{
         width: size,
         height: size,
@@ -85,13 +93,13 @@ const Square: React.FC<SquareProps> = ({
 
       {/* Piece */}
       {piece && (
-        <div style={{
-          position: 'relative',
-          zIndex: 3,
-          transform: isSelected ? 'scale(1.12) translateY(-4px)' : 'scale(1)',
-          transition: 'transform 0.12s ease',
-          filter: isSelected ? 'drop-shadow(0 6px 10px rgba(0,0,0,0.7))' : 'none',
-        }}>
+        <div
+          className={`kf-piece-3d ${isSelected ? 'kf-piece-selected' : ''}`}
+          style={{
+            position: 'relative',
+            zIndex: 3,
+          }}
+        >
           <CheckerPieceCanvas piece={piece} size={size * 0.88} skinId={skinId} />
         </div>
       )}

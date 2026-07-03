@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { GameState, Move, Position } from '../types/checkers.types';
 import { ChipSkinId } from '../types/game.types';
 import Square from './Square';
@@ -39,8 +39,23 @@ const Board: React.FC<BoardProps> = ({
 
   const boardPx = squareSize * 8;
 
+  const [shake, setShake] = useState(false);
+  const prevMoveCountRef = useRef(moveHistory.length);
+  useEffect(() => {
+    if (moveHistory.length > prevMoveCountRef.current) {
+      const last = moveHistory[moveHistory.length - 1]?.move;
+      if (last && last.captures.length > 0) {
+        setShake(true);
+        const t = window.setTimeout(() => setShake(false), 450);
+        return () => window.clearTimeout(t);
+      }
+    }
+    prevMoveCountRef.current = moveHistory.length;
+  }, [moveHistory]);
+
   return (
     <div
+      className={`kf-board-3d kf-board-glow ${shake ? 'kf-shake' : ''}`}
       style={{
         width: boardPx,
         height: boardPx,
@@ -54,7 +69,7 @@ const Board: React.FC<BoardProps> = ({
         overflow: 'hidden',
         cursor: isAITurn ? 'not-allowed' : 'default',
         opacity: isAITurn ? 0.93 : 1,
-        transition: 'opacity 0.3s ease',
+        transition: 'opacity 0.3s ease, transform 0.5s cubic-bezier(0.2, 1.1, 0.4, 1)',
       }}
     >
       {board.map((rowArr, row) =>

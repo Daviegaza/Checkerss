@@ -651,12 +651,11 @@ const GameLobby: React.FC<GameLobbyProps> = ({
       )}
 
       <p style={{
-        maxWidth: 620, textAlign: 'center', color: '#5a4a2a',
+        maxWidth: 620, textAlign: 'center', color: '#8a7a4a',
         fontSize: 11, lineHeight: 1.65, marginTop: 24, fontStyle: 'italic',
         fontFamily: "'Crimson Pro', serif",
       }}>
-        Virtual chips only — no real money. Wins depend on skill vs the AI. Chips carry no cash value.
-        Higher tables contribute more to the progressive jackpot and pay bigger rewards.
+        Higher tables feed the progressive jackpot and pay bigger rewards. Beat the AI, climb the ranks, hunt the crown.
       </p>
 
       <style>{`
